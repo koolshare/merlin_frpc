@@ -17,7 +17,7 @@ def get_or_create():
     conf_path = os.path.join(parent_path, "config.json.js")
     conf = {}
     if not os.path.isfile(conf_path):
-        print u"config.json.js 文件找不到，build.py 一定得放插件根目录。自动为您生成一个config.json.js，其它信息请您自己修改。"
+        print u"config.json.js not found，build.py is root path. auto write config.json.js"
         module_name = os.path.basename(parent_path)
         conf["module"] = module_name
         conf["version"] = "0.0.1"
@@ -33,29 +33,30 @@ def build_module():
     try:
         conf = get_or_create()
     except:
-        print u"config.json.js 文件格式错误"
+        print u"config.json.js file format is incorrect"
         traceback.print_exc()
     if "module" not in conf:
-        print u"没有 module 在 config.json.js 里"
+        print u" module is not in config.json.js"
         return
     module_path = os.path.join(parent_path, conf["module"])
     if not os.path.isdir(module_path):
-        print u"找不到对应的 %s 文件夹，config.json.js 里面的 module 值不对？" % module_path
+        print u"not found %s dir，check config.json.js is module ?" % module_path
         return
     install_path = os.path.join(parent_path, conf["module"], "install.sh")
     if not os.path.isfile(install_path):
-        print u"找不到对应的 %s 文件，插件确实 install.sh 文件"
+        print u"not found %s file，check install.sh file"
         return
-    print u"生成中..."
+    print u"build..."
     t = Template("cd $parent_path && rm -f $module.tar.gz && tar -zcf $module.tar.gz $module")
     os.system(t.substitute({"parent_path": parent_path, "module": conf["module"]}))
     conf["md5"] = md5sum(os.path.join(parent_path, conf["module"] + ".tar.gz"))
     conf_path = os.path.join(parent_path, "config.json.js")
     with codecs.open(conf_path, "w", "utf-8") as fw:
         json.dump(conf, fw, sort_keys = True, indent = 4, ensure_ascii=False, encoding='utf8')
-    print u"生成完成", conf["module"] + ".tar.gz"
+    print u"build done", conf["module"] + ".tar.gz"
     hook_path = os.path.join(parent_path, "backup.sh")
     if os.path.isfile(hook_path):
         os.system(hook_path)
 
 build_module()
+

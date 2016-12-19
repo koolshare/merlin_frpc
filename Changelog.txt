@@ -1,5 +1,7 @@
 Koolshare Asuswrt-Merlin Frpc Changelog
 ===========================================
+1.9.4 ( 2016-12-19 17:03 )
+  - update    好吧，我就是刷个版本号
 1.9.3 ( 2016-12-18 13:17 )
   - update    脚本：修复不能自动启动问题
 1.9.2 ( 忘了 )
@@ -32,3 +34,4 @@ Koolshare Asuswrt-Merlin Frpc Changelog
   - Fix       呃，忘了修复的内容了
 1.0.0 ( 2016-09-30 23:12 )
   - Add       添加Frp穿透神器
+
