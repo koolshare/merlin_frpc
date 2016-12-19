@@ -400,7 +400,7 @@ function version_show(){
                                         <td>
                                             <div id="frpc_version_show" style="padding-top:5px;margin-left:0px;margin-top:0px;float: left;"><i>插件版本：<% dbus_get_def("frpc_version", "未知"); %></i></div>
                                             <div id="frpc_client_version_show" style="padding-top:5px;margin-left:50px;margin-top:0px;float: left;"><i>Frpc版本：<% dbus_get_def("frpc_client_version", "未知"); %></i></div>
-                                            <a style="margin-left: 170px;" href="https://raw.githubusercontent.com/koolshare/koolshare.github.io/acelan_softcenter_ui/frpc/Changelog.txt" target="_blank"><em><u>[ 更新日志 ]</u></em></a>
+                                            <a style="margin-left: 170px;" href="https://raw.githubusercontent.com/koolshare/merlin_frpc/master/Changelog.txt" target="_blank"><em><u>[ 更新日志 ]</u></em></a>
                                         </td>
                                         <tr>
                                             <th width="20%"><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(1)">服务器</a></th>
