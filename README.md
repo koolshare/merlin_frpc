@@ -1,3 +1,3 @@
 # merlin_frpc
 
-frpc client for merlin
+frp client for merlin
