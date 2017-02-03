@@ -1,6 +1,7 @@
 ﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+<!-- version: 1.9.8 -->
 <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta HTTP-EQUIV="Pragma" CONTENT="no-cache"/>
@@ -106,10 +107,6 @@ function validForm(){
     return true;
 }
 
-function pass_checked(obj){
-	switchType(obj, document.form.show_pass.checked, true);
-}
-
 function onSubmitCtrl(o, s) { //提交操作，提交时运行config-frpc.sh，显示5秒的载入画面
     var _form = document.form;
     if(trim(_form.frpc_common_server_addr.value)=="" || trim(_form.frpc_common_server_port.value)=="" || trim(_form.frpc_common_privilege_token.value)=="" || trim(_form.frpc_common_vhost_http_port.value)=="" || trim(_form.frpc_common_vhost_https_port.value)=="" || trim(_form.frpc_common_cron_time.value)==""){   
@@ -170,6 +167,7 @@ function addTr(o) { //添加配置行操作
             document.form.remoteport_node.value = "";
             document.form.encryption_node.value = "true";
             document.form.gzip_node.value = "true";
+            document.getElementById('remoteport_node').disabled=false;
         }
     });
     myid=0;
@@ -242,6 +240,8 @@ function editlTr(o){ //编辑节点功能，显示编辑面板
         document.getElementById('remoteport_node').disabled=true;
         document.getElementById('remoteport_node').value=c["common_vhost_https_port"];
     } else if(remoteport == "tcp"){
+        document.getElementById('remoteport_node').disabled=false;
+    } else if(remoteport == "udp"){
         document.getElementById('remoteport_node').disabled=false;
     }
     document.form.remoteport_node.value = c["remoteport_node"];
@@ -323,7 +323,7 @@ function version_show(){
                 if(res["version"] == db_frpc["frpc_version"]){
                     $j("#frpc_version_show").html("<i>插件版本：" + res["version"]);
                    }else if(res["version"] > db_frpc["frpc_version"]) {
-                    $j("#frpc_version_show").html("<i>有新版本：" + res.version);
+                    $j("#frpc_version_show").html("<font color=\"#66FF66\">有新版本：</font>" + res.version);
                 }
             }
         }
@@ -419,8 +419,7 @@ function version_show(){
                                         <tr>
                                             <th width="20%"><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(3)">Privilege Token</a></th>
                                             <td>
-                                                <input type="password" class="input_ss_table" id="frpc_common_privilege_token" name="frpc_common_privilege_token" maxlength="256" autocomplete="new-password" value="" />
-                                                <div style="margin-left:170px;margin-top:-20px;margin-bottom:0px"><input type="checkbox" name="show_pass" onclick="pass_checked(document.form.frpc_common_privilege_token);">显示密码</div>
+                                                <input type="password" name="frpc_common_privilege_token" id="frpc_common_privilege_token" class="input_ss_table" autocomplete="new-password" autocorrect="off" autocapitalize="off" maxlength="256" value="" onBlur="switchType(this, false);" onFocus="switchType(this, true);"/>
                                             </td>
                                         </tr>
                                         
@@ -520,6 +519,7 @@ function version_show(){
                                         <td>
                                             <select id="proto_node" name="proto_node" style="width:70px;margin:0px 0px 0px 2px;" class="input_option" onchange="proto_onchange()" >
                                                 <option value="tcp">tcp</option>
+                                                <option value="udp">udp</option>
                                                 <option value="http">http</option>
                                                 <option value="https">https</option>
                                             </select>
@@ -607,6 +607,8 @@ if (remoteport == "http") {
         document.getElementById('remoteport_node').disabled=true;
         document.getElementById('remoteport_node').value=vhost_https_port;
     } else if(remoteport == "tcp"){
+        document.getElementById('remoteport_node').disabled=false;
+    } else if(remoteport == "udp"){
         document.getElementById('remoteport_node').disabled=false;
     }
 }
