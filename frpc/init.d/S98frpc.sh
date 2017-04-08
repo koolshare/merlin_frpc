@@ -1,3 +1,3 @@
 #!/bin/sh
-sleep 60
+sleep 40
 sh /koolshare/scripts/config-frpc.sh

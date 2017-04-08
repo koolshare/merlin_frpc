@@ -47,29 +47,29 @@ use_encryption = ${array_use_encryption}
 use_gzip = ${array_use_gzip}
 EOF
 # ddns setting
-if [ "${frpc_common_ddns}" == "1" ] && [ "${array_local_ip}" == "${lan_ip}" ] && [ "${array_local_port}" == "80" ]; then
+if [[ "${frpc_common_ddns}" == "1" ]] && [[ "${array_local_ip}" == "${lan_ip}" || "${array_local_ip}" == "127.0.0.1" ]] && [[ "${array_local_port}" == "80" ]]; then
 	nvram set ddns_enable_x=1
 	nvram set ddns_hostname_x=${array_custom_domains}
 	ddns_custom_updated 1
 	nvram commit
-elif  [ "${frpc_common_ddns}" == "0" ] && [ "${array_local_ip}" == "${lan_ip}" ] && [ "${array_local_port}" == "80" ]; then
+elif[[ "${frpc_common_ddns}" == "0" ]] && [[ "${array_local_ip}" == "${lan_ip}" || "${array_local_ip}" == "127.0.0.1" ]] && [[ "${array_local_port}" == "80" ]]; then
 	nvram set ddns_enable_x=0
 	nvram commit
 fi
 done
 
 echo -n "setting ${NAME} crontab..."
-if [ "${frpc_common_cron_time}" == "0" ]; then
+if [[ "${frpc_common_cron_time}" == "0" ]]; then
 	cru d frpc_monitor
 else
-	if [ "${frpc_common_cron_hour_min}" == "min" ]; then
+	if [[ "${frpc_common_cron_hour_min}" == "min" ]]; then
 		cru a frpc_monitor "*/"${frpc_common_cron_time}" * * * * /bin/sh /koolshare/scripts/config-frpc.sh"
-	elif [ "${frpc_common_cron_hour_min}" == "hour" ]; then
+	elif [[ "${frpc_common_cron_hour_min}" == "hour" ]]; then
 		cru a frpc_monitor "0 */"${frpc_common_cron_time}" * * * /bin/sh /koolshare/scripts/config-frpc.sh"
 	fi
 fi
 echo " done"
-if [ "$en" == "1" ]; then
+if [[ "$en" == "1" ]]; then
 echo -n "starting ${NAME}..."
 export GOGC=40
 start-stop-daemon -S -q -b -m -p ${PID_FILE} -x ${BIN} -- -c ${INI_FILE}
@@ -82,7 +82,7 @@ stop() {
 	echo -n "stop ${NAME}..."
 	killall frpc || true
 	cru d frpc_monitor
-	if  [ "${frpc_common_ddns}" == "1" ]; then
+	if  [[ "${frpc_common_ddns}" == "1" ]]; then
 		nvram set ddns_enable_x=0
 		nvram commit
 	fi
@@ -91,7 +91,7 @@ stop() {
 
 case $ACTION in
 start)
-	if [ "$en" == "1" ]; then
+	if [[ "$en" == "1" ]]; then
 		logger "[软件中心]: 启动frpc！"
 		onstart
 	else

@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<!-- version: 1.9.8 -->
+<!-- version: 2.0.0 -->
 <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta HTTP-EQUIV="Pragma" CONTENT="no-cache"/>
@@ -522,6 +522,9 @@ function version_show(){
                                                 <option value="udp">udp</option>
                                                 <option value="http">http</option>
                                                 <option value="https">https</option>
+                                                <option value="http">router-http</option>
+                                                <option value="https">router-https</option>
+                                                <option value="tcp">router-ssh</option>
                                             </select>
 
                                         </td>
@@ -597,9 +600,18 @@ function version_show(){
 function proto_onchange()
 {
 var remoteport="";
+var obj=document.getElementById('proto_node'); 
+var index=obj.selectedIndex; //序号，取当前选中选项的序号
+var r_https_port="<%  nvram_get(https_lanport); %>"
+var r_ssh_port="<%  nvram_get(sshd_port); %>"
+var r_computer_name="<%  nvram_get(computer_name); %>"
+var r_subname_node_http= r_computer_name + '-http';
+var r_subname_node_https= r_computer_name + '-https';
+var r_subname_node_ssh= r_computer_name + '-ssh';
+//alert(r_https_port);
 vhost_http_port=document.getElementById("frpc_common_vhost_http_port").value;
 vhost_https_port=document.getElementById("frpc_common_vhost_https_port").value;
-remoteport=document.getElementById("proto_node").value;
+remoteport=obj.options[index].text;
 if (remoteport == "http") {
         document.getElementById('remoteport_node').disabled=true;
         document.getElementById('remoteport_node').value=vhost_http_port;
@@ -610,6 +622,24 @@ if (remoteport == "http") {
         document.getElementById('remoteport_node').disabled=false;
     } else if(remoteport == "udp"){
         document.getElementById('remoteport_node').disabled=false;
+    } else if(remoteport == "router-http"){
+        document.getElementById('remoteport_node').disabled=true;
+        document.getElementById('remoteport_node').value=vhost_http_port;
+        document.getElementById('subname_node').value=r_subname_node_http;
+        document.getElementById('localhost_node').value="127.0.0.1";
+        document.getElementById('localport_node').value="80";
+    } else if(remoteport == "router-https"){
+        document.getElementById('remoteport_node').disabled=true;
+        document.getElementById('remoteport_node').value=vhost_https_port;
+        document.getElementById('subname_node').value=r_subname_node_https;
+        document.getElementById('localhost_node').value="127.0.0.1";
+        document.getElementById('localport_node').value=r_https_port;
+    } else if(remoteport == "router-ssh"){
+        document.getElementById('remoteport_node').disabled=false;
+        document.getElementById('remoteport_node').value="";
+        document.getElementById('subname_node').value=r_subname_node_ssh;
+        document.getElementById('localhost_node').value="127.0.0.1";
+        document.getElementById('localport_node').value=r_ssh_port;
     }
 }
 <!--[if !IE]>-->
