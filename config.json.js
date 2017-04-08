@@ -3,6 +3,6 @@
     "home_url": "Module_frpc.asp", 
     "md5": "4e8d5c745eb7fede23d66ddca37fce10", 
     "module": "frpc", 
-    "title": "frpc穿透", 
+    "title": "frpc", 
     "version": "2.0.0"
 }
