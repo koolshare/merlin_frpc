@@ -52,7 +52,7 @@ if [[ "${frpc_common_ddns}" == "1" ]] && [[ "${array_local_ip}" == "${lan_ip}" |
 	nvram set ddns_hostname_x=${array_custom_domains}
 	ddns_custom_updated 1
 	nvram commit
-elif[[ "${frpc_common_ddns}" == "0" ]] && [[ "${array_local_ip}" == "${lan_ip}" || "${array_local_ip}" == "127.0.0.1" ]] && [[ "${array_local_port}" == "80" ]]; then
+elif [[ "${frpc_common_ddns}" == "0" ]] && [[ "${array_local_ip}" == "${lan_ip}" || "${array_local_ip}" == "127.0.0.1" ]] && [[ "${array_local_port}" == "80" ]]; then
 	nvram set ddns_enable_x=0
 	nvram commit
 fi
