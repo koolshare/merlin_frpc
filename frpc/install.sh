@@ -1,7 +1,7 @@
 #!/bin/sh
 
 MODULE=frpc
-VERSION="2.0.1"
+VERSION="2.0.2"
 cd /
 rm -f /koolshare/init.d/S98frpc.sh
 cp -f /tmp/$MODULE/bin/* /koolshare/bin/

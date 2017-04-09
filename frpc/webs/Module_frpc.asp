@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<!-- version: 2.0.1 -->
+<!-- version: 2.0.2 -->
 <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta HTTP-EQUIV="Pragma" CONTENT="no-cache"/>
@@ -605,6 +605,7 @@ var index=obj.selectedIndex; //序号，取当前选中选项的序号
 var r_https_port="<%  nvram_get(https_lanport); %>"
 var r_ssh_port="<%  nvram_get(sshd_port); %>"
 var r_computer_name="<%  nvram_get(computer_name); %>"
+var r_lan_ipaddr="<% nvram_get(lan_ipaddr); %>"
 var r_subname_node_http= r_computer_name + '-http';
 var r_subname_node_https= r_computer_name + '-https';
 var r_subname_node_ssh= r_computer_name + '-ssh';
@@ -638,7 +639,7 @@ if (remoteport == "http") {
         document.getElementById('remoteport_node').disabled=false;
         document.getElementById('remoteport_node').value="";
         document.getElementById('subname_node').value=r_subname_node_ssh;
-        document.getElementById('localhost_node').value="127.0.0.1";
+        document.getElementById('localhost_node').value=r_lan_ipaddr;
         document.getElementById('localport_node').value=r_ssh_port;
     }
 }
