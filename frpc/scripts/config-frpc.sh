@@ -24,6 +24,7 @@ log_level = ${frpc_common_log_level}
 log_max_days = ${frpc_common_log_max_days}
 tcp_mux = ${frpc_common_tcp_mux}
 protocol = ${frpc_common_protocol}
+login_fail_exit = ${frpc_common_login_fail_exit}
 user = ${frpc_common_user}
 EOF
 

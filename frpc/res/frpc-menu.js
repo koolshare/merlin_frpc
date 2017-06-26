@@ -93,6 +93,10 @@ function openssHint(itemNum){
         statusmenu ="从 v0.10.0 版本开始，客户端和服务器端之间的连接支持多路复用，不再需要为每一个用户请求创建一个连接，使连接建立的延迟降低，并且避免了大量文件描述符的占用，使 frp 可以承载更高的并发数。</br>该功能默认启用，如需关闭，可以在 frps.ini 和 frpc.ini 中配置，该配置项在服务端和客户端必须一致.";
         _caption = "TCP 多路复用";
     }
+    else if(itemNum == 22){
+        statusmenu ="当客户端连接服务器失败后的动作：</br>失败后重复连接</br>失败后退出客户端";
+        _caption = "连接设置";
+    }
         //return overlib(statusmenu, OFFSETX, -160, LEFT, DELAY, 200);
         //return overlib(statusmenu, OFFSETX, -160, LEFT, STICKY, WIDTH, 'width', CAPTION, " ", FGCOLOR, "#4D595D", CAPCOLOR, "#000000", CLOSECOLOR, "#000000", MOUSEOFF, "1",TEXTCOLOR, "#FFF", CLOSETITLE, '');
         return overlib(statusmenu, OFFSETX, -160, LEFT, STICKY, WIDTH, 'width', CAPTION, _caption, CLOSETITLE, '');
