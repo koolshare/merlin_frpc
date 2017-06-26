@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 MD5='md5sum'
 unamestr=`uname`
 

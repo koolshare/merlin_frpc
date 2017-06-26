@@ -22,6 +22,9 @@ privilege_token = ${frpc_common_privilege_token}
 log_file = ${frpc_common_log_file}
 log_level = ${frpc_common_log_level}
 log_max_days = ${frpc_common_log_max_days}
+tcp_mux = ${frpc_common_tcp_mux}
+protocol = ${frpc_common_protocol}
+user = ${frpc_common_user}
 EOF
 
 server_nu=`dbus list frpc_localhost_node | sort -n -t "_" -k 4|cut -d "=" -f 1|cut -d "_" -f 4`
@@ -37,14 +40,13 @@ do
 	array_use_gzip=`dbus get frpc_gzip_node_$nu`
 cat >> ${INI_FILE} <<EOF
 [${array_subname}]
-privilege_mode = true
 type = ${array_type}
 local_ip = ${array_local_ip}
 local_port = ${array_local_port}
 remote_port = ${array_remote_port}
 custom_domains = ${array_custom_domains}
 use_encryption = ${array_use_encryption}
-use_gzip = ${array_use_gzip}
+use_compression = ${array_use_gzip}
 EOF
 # ddns setting
 if [[ "${frpc_common_ddns}" == "1" ]] && [[ "${array_local_ip}" == "${lan_ip}" || "${array_local_ip}" == "127.0.0.1" ]] && [[ "${array_local_port}" == "80" ]]; then
