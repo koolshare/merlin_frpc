@@ -1,14 +1,14 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<!-- version: 2.0.4 -->
+<!-- version: 2.0.5 -->
 <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta HTTP-EQUIV="Pragma" CONTENT="no-cache"/>
 <meta HTTP-EQUIV="Expires" CONTENT="-1"/>
 <link rel="shortcut icon" href="images/favicon.png"/>
 <link rel="icon" href="images/favicon.png"/>
-<title>软件中心 - frp</title>
+<title>软件中心 - Frp内网穿透</title>
 <link rel="stylesheet" type="text/css" href="index_style.css"/> 
 <link rel="stylesheet" type="text/css" href="form_style.css"/>
 <link rel="stylesheet" type="text/css" href="css/element.css">
@@ -95,7 +95,6 @@ function buildswitch(){ //生成开关的功能，checked为开启，此时传�
         }
     });
 }
-
 function conf2obj(){ //表单填写函数，将dbus数据填入到对应的表单中
     for (var field in db_frpc) {
         $j('#'+field).val(db_frpc[field]);
@@ -127,9 +126,16 @@ function reload_Soft_Center(){ //返回软件中心按钮
 
 function addTr(o) { //添加配置行操作
     var _form_addTr = document.form;
-    if(trim(_form_addTr.subname_node.value)=="" || trim(_form_addTr.subdomain_node.value)=="" || trim(_form_addTr.localhost_node.value)=="" || trim(_form_addTr.localport_node.value)=="" || trim(_form_addTr.remoteport_node.value)==""){
-        alert("提交的表单不能为空!");
-        return false;
+    if(trim(_form_addTr.proto_node.value)=="tcp" || trim(_form_addTr.proto_node.value)=="udp"){
+        if(trim(_form_addTr.subname_node.value)=="" || trim(_form_addTr.localhost_node.value)=="" || trim(_form_addTr.localport_node.value)=="" || trim(_form_addTr.remoteport_node.value)==""){
+            alert("提交的表单不能为空!");
+            return false;
+        }
+    }else{
+        if(trim(_form_addTr.subname_node.value)=="" || trim(_form_addTr.subdomain_node.value)=="" || trim(_form_addTr.localhost_node.value)=="" || trim(_form_addTr.localport_node.value)=="" || trim(_form_addTr.remoteport_node.value)==""){
+            alert("提交的表单不能为空!");
+            return false;
+        }
     }
     var ns = {};
     var p = "frpc";
@@ -160,45 +166,48 @@ function addTr(o) { //添加配置行操作
             // 添加成功一个后将输入框清空
             document.form.proto_node.value = "tcp";
             document.form.subname_node.value = "";
-            document.form.subdomain_node.value = "";
+            document.form.subdomain_node.value = "none";
             document.form.localhost_node.value = "";
             document.form.localport_node.value = "";
             document.form.remoteport_node.value = "";
             document.form.encryption_node.value = "true";
             document.form.gzip_node.value = "true";
             document.getElementById('remoteport_node').disabled=false;
+            document.getElementById('subdomain_node').disabled=true;
         }
     });
     myid=0;
 }
 
 function delTr(o) { //删除配置行功能
-    //定位每行配置对应的ID号
-    var id = $j(o).attr("id");
-    var ids = id.split("_");
-    var p = "frpc";
-    id = ids[ids.length - 1];
-    // 定义ns数组，用于回传给dbus
-    var ns = {};
-    var params = ["proto_node", "subname_node", "subdomain_node", "localhost_node",  "localport_node", "remoteport_node", "encryption_node", "gzip_node"];
-    for (var i = 0; i < params.length; i++) {
-        //空的值，用于清除dbus中的对应值
-        ns[p + "_" + params[i] + "_" + id] = "";
-    }
-     //回传删除数据操作给dbus接口
-    $j.ajax({
-        url: '/applydb.cgi?use_rm=1&p=frpc',
-        contentType: "application/x-www-form-urlencoded",
-        dataType: 'text',
-        data: $j.param(ns),
-        error: function(xhr) {
-            console.log("error in posting config of table");
-        },
-        success: function(response) {
-            //回传成功后，重新生成表格
-            refresh_table();
+    if (confirm("你确定删除吗？")) {
+        //定位每行配置对应的ID号
+        var id = $j(o).attr("id");
+        var ids = id.split("_");
+        var p = "frpc";
+        id = ids[ids.length - 1];
+        // 定义ns数组，用于回传给dbus
+        var ns = {};
+        var params = ["proto_node", "subname_node", "subdomain_node", "localhost_node",  "localport_node", "remoteport_node", "encryption_node", "gzip_node"];
+        for (var i = 0; i < params.length; i++) {
+            //空的值，用于清除dbus中的对应值
+            ns[p + "_" + params[i] + "_" + id] = "";
         }
-    });
+        //回传删除数据操作给dbus接口
+        $j.ajax({
+            url: '/applydb.cgi?use_rm=1&p=frpc',
+            contentType: "application/x-www-form-urlencoded",
+            dataType: 'text',
+            data: $j.param(ns),
+            error: function(xhr) {
+                console.log("error in posting config of table");
+            },
+            success: function(response) {
+                //回传成功后，重新生成表格
+                refresh_table();
+            }
+        });
+    }
 }
 
 function refresh_table() {
@@ -234,14 +243,20 @@ function editlTr(o){ //编辑节点功能，显示编辑面板
     remoteport=document.form.proto_node.value;
     if (remoteport == "http") {
         document.getElementById('remoteport_node').disabled=true;
+        document.getElementById('subdomain_node').disabled=false;
         document.getElementById('remoteport_node').value=c["common_vhost_http_port"];
     } else if(remoteport == "https"){
         document.getElementById('remoteport_node').disabled=true;
+        document.getElementById('subdomain_node').disabled=false;
         document.getElementById('remoteport_node').value=c["common_vhost_https_port"];
     } else if(remoteport == "tcp"){
         document.getElementById('remoteport_node').disabled=false;
+        document.getElementById('subdomain_node').disabled=true;
+        document.getElementById('subdomain_node').value="none";
     } else if(remoteport == "udp"){
         document.getElementById('remoteport_node').disabled=false;
+        document.getElementById('subdomain_node').disabled=true;
+        document.getElementById('subdomain_node').value="none";
     }
     document.form.remoteport_node.value = c["remoteport_node"];
     document.form.encryption_node.value = c["encryption_node"];
@@ -271,6 +286,7 @@ function getAllConfigs() { //用dbus数据生成数据组，方便用于refresh_
                 break;
             }
             obj[params[i]] = db_frpc[ofield];
+            //alert(i);
         }
         if (obj != null) {
             var node_i = parseInt(field);
@@ -295,7 +311,11 @@ function refresh_html() { //用conf数据生成配置表格
         html = html + '<tr>';
         html = html + '<td>' + c["proto_node"] + '</td>';
         html = html + '<td>' + c["subname_node"] + '</td>';
-        html = html + '<td>' + c["subdomain_node"] + '</td>';
+        if(c["subdomain_node"]=="none"){
+            html = html + '<td>' + "" + '</td>';
+        }else{
+            html = html + '<td>' + c["subdomain_node"] + '</td>';
+        }
         html = html + '<td>' + c["localhost_node"] + '</td>';
         html = html + '<td>' + c["localport_node"] + '</td>';
         html = html + '<td>' + c["remoteport_node"] + '</td>';
@@ -336,8 +356,8 @@ function version_show(){
 <div id="Loading" class="popup_bg"></div>
 <iframe name="hidden_frame" id="hidden_frame" src="" width="0" height="0" frameborder="0"></iframe>
 <form method="POST" name="form" action="/applydb.cgi?p=frpc" target="hidden_frame">
-<input type="hidden" name="current_page" value="Module_webshell.asp"/>
-<input type="hidden" name="next_page" value="Main_webshell.asp"/>
+<input type="hidden" name="current_page" value="Module_frpc.asp"/>
+<input type="hidden" name="next_page" value="Module_frpc.asp"/>
 <input type="hidden" name="group_id" value=""/>
 <input type="hidden" name="modified" value="0"/>
 <input type="hidden" name="action_mode" value=""/>
@@ -365,7 +385,7 @@ function version_show(){
                             <tr>
                                 <td bgcolor="#4D595D" colspan="3" valign="top">
                                     <div>&nbsp;</div>
-                                    <div style="float:left;" class="formfonttitle">软件中心 - Frpc</div>
+                                    <div style="float:left;" class="formfonttitle">软件中心 - Frpc内网穿透</div>
                                     <div style="float:right; width:15px; height:25px;margin-top:10px"><img id="return_btn" onclick="reload_Soft_Center();" align="right" style="cursor:pointer;position:absolute;margin-left:-30px;margin-top:-25px;" title="返回软件中心" src="/images/backprev.png" onMouseOver="this.src='/images/backprevclick.png'" onMouseOut="this.src='/images/backprev.png'"></img></div>
                                     <div style="margin-left:5px;margin-top:10px;margin-bottom:10px"><img src="/images/New_ui/export/line_export.png"/></div>
                                     <div class="formfontdesc" id="cmdDesc"><i>* 为了Frpc稳定运行，请开启虚拟内存功能！！！</i>&nbsp;&nbsp;&nbsp;&nbsp;【<a href="http://koolshare.cn/thread-65379-1-1.html"  target="_blank"><i>服务器搭建教程</i></a>】</div>
@@ -513,9 +533,10 @@ function version_show(){
                                         <tr>
                                             <th width="20%"><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(18)">DDNS显示设置</a></th>
                                             <td>
-                                                <select id="frpc_common_ddns" name="frpc_common_ddns" style="width:60px;margin:3px 2px 0px 2px;" class="input_option">
-                                                    <option value="1">开</option>
-                                                    <option value="0" selected="selected">关</option>
+                                                <select id="frpc_common_ddns" name="frpc_common_ddns" style="width:165px;margin:0px 0px 0px 2px;" class="input_option">
+                                                    <option value="2" selected="selected">不做更改</option>
+                                                    <option value="1">开启</option>
+                                                    <option value="0">关闭</option>
                                                 </select>
                                             </td>
                                         </tr>
@@ -568,7 +589,7 @@ function version_show(){
                                             <input type="text" id="subname_node" name="subname_node" class="input_6_table" maxlength="50" style="width:60px;" placeholder=""/>
                                         </td>
                                          <td>
-                                            <input type="text" id="subdomain_node" name="subdomain_node" class="input_12_table" maxlength="250" placeholder=""/>
+                                            <input type="text" id="subdomain_node" name="subdomain_node" class="input_12_table" maxlength="250" value="none" placeholder="" disabled/>
                                         </td>
                                         <td>
                                             <input type="text" id="localhost_node" name="localhost_node" class="input_12_table" maxlength="20" placeholder=""/>
@@ -651,22 +672,34 @@ vhost_https_port=document.getElementById("frpc_common_vhost_https_port").value;
 remoteport=obj.options[index].text;
 if (remoteport == "http") {
         document.getElementById('remoteport_node').disabled=true;
+        document.getElementById('subdomain_node').disabled=false;
+        document.getElementById('subdomain_node').value="";
         document.getElementById('remoteport_node').value=vhost_http_port;
     } else if(remoteport == "https"){
         document.getElementById('remoteport_node').disabled=true;
+        document.getElementById('subdomain_node').disabled=false;
+        document.getElementById('subdomain_node').value="";
         document.getElementById('remoteport_node').value=vhost_https_port;
     } else if(remoteport == "tcp"){
         document.getElementById('remoteport_node').disabled=false;
+        document.getElementById('subdomain_node').disabled=true;
+        document.getElementById('subdomain_node').value="none";
     } else if(remoteport == "udp"){
         document.getElementById('remoteport_node').disabled=false;
+        document.getElementById('subdomain_node').disabled=true;
+        document.getElementById('subdomain_node').value="none";
     } else if(remoteport == "router-http"){
         document.getElementById('remoteport_node').disabled=true;
+        document.getElementById('subdomain_node').disabled=false;
+        document.getElementById('subdomain_node').value="";
         document.getElementById('remoteport_node').value=vhost_http_port;
         document.getElementById('subname_node').value=r_subname_node_http;
         document.getElementById('localhost_node').value="127.0.0.1";
         document.getElementById('localport_node').value="80";
     } else if(remoteport == "router-https"){
         document.getElementById('remoteport_node').disabled=true;
+        document.getElementById('subdomain_node').disabled=false;
+        document.getElementById('subdomain_node').value="";
         document.getElementById('remoteport_node').value=vhost_https_port;
         document.getElementById('subname_node').value=r_subname_node_https;
         document.getElementById('localhost_node').value="127.0.0.1";
@@ -674,6 +707,8 @@ if (remoteport == "http") {
     } else if(remoteport == "router-ssh"){
         document.getElementById('remoteport_node').disabled=false;
         document.getElementById('remoteport_node').value="";
+        document.getElementById('subdomain_node').disabled=true;
+        document.getElementById('subdomain_node').value="none";
         document.getElementById('subname_node').value=r_subname_node_ssh;
         document.getElementById('localhost_node').value=r_lan_ipaddr;
         document.getElementById('localport_node').value=r_ssh_port;

@@ -31,14 +31,25 @@ EOF
 server_nu=`dbus list frpc_localhost_node | sort -n -t "_" -k 4|cut -d "=" -f 1|cut -d "_" -f 4`
 for nu in ${server_nu}
 do
-	array_subname=`dbus get frpc_subname_node_$nu`
-	array_type=`dbus get frpc_proto_node_$nu`
-	array_local_ip=`dbus get frpc_localhost_node_$nu`
-	array_local_port=`dbus get frpc_localport_node_$nu`
-	array_remote_port=`dbus get frpc_remoteport_node_$nu`
-	array_custom_domains=`dbus get frpc_subdomain_node_$nu`
-	array_use_encryption=`dbus get frpc_encryption_node_$nu`
-	array_use_gzip=`dbus get frpc_gzip_node_$nu`
+    array_subname=`dbus get frpc_subname_node_$nu`
+    array_type=`dbus get frpc_proto_node_$nu`
+    array_local_ip=`dbus get frpc_localhost_node_$nu`
+    array_local_port=`dbus get frpc_localport_node_$nu`
+    array_remote_port=`dbus get frpc_remoteport_node_$nu`
+    array_custom_domains=`dbus get frpc_subdomain_node_$nu`
+    array_use_encryption=`dbus get frpc_encryption_node_$nu`
+    array_use_gzip=`dbus get frpc_gzip_node_$nu`
+if [[ "${array_type}" == "tcp" ]] || [[ "${array_type}" == "udp" ]]; then
+cat >> ${INI_FILE} <<EOF
+[${array_subname}]
+type = ${array_type}
+local_ip = ${array_local_ip}
+local_port = ${array_local_port}
+remote_port = ${array_remote_port}
+use_encryption = ${array_use_encryption}
+use_compression = ${array_use_gzip}
+EOF
+else
 cat >> ${INI_FILE} <<EOF
 [${array_subname}]
 type = ${array_type}
@@ -49,27 +60,28 @@ custom_domains = ${array_custom_domains}
 use_encryption = ${array_use_encryption}
 use_compression = ${array_use_gzip}
 EOF
+fi
 # ddns setting
 if [[ "${frpc_common_ddns}" == "1" ]] && [[ "${array_local_ip}" == "${lan_ip}" || "${array_local_ip}" == "127.0.0.1" ]] && [[ "${array_local_port}" == "80" ]]; then
-	nvram set ddns_enable_x=1
-	nvram set ddns_hostname_x=${array_custom_domains}
-	ddns_custom_updated 1
-	nvram commit
+    nvram set ddns_enable_x=1
+    nvram set ddns_hostname_x=${array_custom_domains}
+    ddns_custom_updated 1
+    nvram commit
 elif [[ "${frpc_common_ddns}" == "0" ]] && [[ "${array_local_ip}" == "${lan_ip}" || "${array_local_ip}" == "127.0.0.1" ]] && [[ "${array_local_port}" == "80" ]]; then
-	nvram set ddns_enable_x=0
-	nvram commit
+    nvram set ddns_enable_x=0
+    nvram commit
 fi
 done
 
 echo -n "setting ${NAME} crontab..."
 if [[ "${frpc_common_cron_time}" == "0" ]]; then
-	cru d frpc_monitor
+    cru d frpc_monitor
 else
-	if [[ "${frpc_common_cron_hour_min}" == "min" ]]; then
-		cru a frpc_monitor "*/"${frpc_common_cron_time}" * * * * /bin/sh /koolshare/scripts/config-frpc.sh"
-	elif [[ "${frpc_common_cron_hour_min}" == "hour" ]]; then
-		cru a frpc_monitor "0 */"${frpc_common_cron_time}" * * * /bin/sh /koolshare/scripts/config-frpc.sh"
-	fi
+    if [[ "${frpc_common_cron_hour_min}" == "min" ]]; then
+        cru a frpc_monitor "*/"${frpc_common_cron_time}" * * * * /bin/sh /koolshare/scripts/config-frpc.sh"
+    elif [[ "${frpc_common_cron_hour_min}" == "hour" ]]; then
+        cru a frpc_monitor "0 */"${frpc_common_cron_time}" * * * /bin/sh /koolshare/scripts/config-frpc.sh"
+    fi
 fi
 echo " done"
 if [[ "$en" == "1" ]]; then
@@ -78,33 +90,33 @@ export GOGC=40
 start-stop-daemon -S -q -b -m -p ${PID_FILE} -x ${BIN} -- -c ${INI_FILE}
 echo " done"
 else
-	stop
+    stop
 fi
 }
 stop() {
-	echo -n "stop ${NAME}..."
-	killall frpc || true
-	cru d frpc_monitor
-	if  [[ "${frpc_common_ddns}" == "1" ]]; then
-		nvram set ddns_enable_x=0
-		nvram commit
-	fi
-	echo " done"
+    echo -n "stop ${NAME}..."
+    killall frpc || true
+    cru d frpc_monitor
+    if  [[ "${frpc_common_ddns}" == "1" ]]; then
+        nvram set ddns_enable_x=0
+        nvram commit
+    fi
+    echo " done"
 }
 
 case $ACTION in
 start)
-	if [[ "$en" == "1" ]]; then
-		logger "[软件中心]: 启动frpc！"
-		onstart
-	else
-		logger "[软件中心]: frpc未设置开机启动，跳过！"
-	fi
-	;;
+    if [[ "$en" == "1" ]]; then
+        logger "[软件中心]: 启动frpc！"
+        onstart
+    else
+        logger "[软件中心]: frpc未设置开机启动，跳过！"
+    fi
+    ;;
 stop)
-	stop
-	;;
+    stop
+    ;;
 *)
-	onstart
-	;;
+    onstart
+    ;;
 esac
