@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<!-- version: 2.0.5 -->
+<!-- version: 2.0.6 -->
 <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta HTTP-EQUIV="Pragma" CONTENT="no-cache"/>
@@ -13,6 +13,27 @@
 <link rel="stylesheet" type="text/css" href="form_style.css"/>
 <link rel="stylesheet" type="text/css" href="css/element.css">
 <style>
+.Bar_container {
+    width:85%;
+    height:20px;
+    border:1px inset #999;
+    margin:0 auto;
+    margin-top:20px \9;
+    background-color:#FFFFFF;
+    z-index:100;
+}
+#proceeding_img_text {
+    position:absolute;
+    z-index:101;
+    font-size:11px;
+    color:#000000;
+    line-height:21px;
+    width: 83%;
+}
+#proceeding_img {
+    height:21px;
+    background:#C0D1D3 url(/images/ss_proceding.gif);
+}
 #ClientList_Block_PC{
     border:1px outset #999;
     background-color:#576D73;
@@ -37,7 +58,6 @@
     font-family: Lucida Console;
     padding-left:2px;
 }
-
 #ClientList_Block_PC a{
     background-color:#EFEFEF;
     color:#FFF;
@@ -45,11 +65,32 @@
     font-family:Arial, Helvetica, sans-serif;
     text-decoration:none;
 }
-#ClientList_Block_PC div:hover{
+#ClientList_Block_PC div:hover, #ClientList_Block a:hover {
     background-color:#3366FF;
     color:#FFFFFF;
     cursor:default;
-}    
+}
+.frpc_btn {
+    border: 1px solid #222;
+    background: linear-gradient(to bottom, #003333  0%, #000000 100%); /* W3C */
+    font-size:10pt;
+    color: #fff;
+    padding: 5px 5px;
+    border-radius: 5px 5px 5px 5px;
+    width:16%;
+}
+.frpc_btn:hover {
+    border: 1px solid #222;
+    background: linear-gradient(to bottom, #27c9c9  0%, #279fd9 100%); /* W3C */
+    font-size:10pt;
+    color: #fff;
+    padding: 5px 5px;
+    border-radius: 5px 5px 5px 5px;
+    width:16%;
+}
+input[type=button]:focus {
+    outline: none;
+}
 </style>
 <link rel="stylesheet" type="text/css" href="usp_style.css"/>
 <script type="text/javascript" src="/state.js"></script>
@@ -68,14 +109,61 @@ var $G = function(id) {
     return document.getElementById(id);
 };
 function initial(){
-    show_menu();
+    show_menu(menu_hook);
+    get_status();
     conf2obj();
     refresh_table();
     version_show();
     buildswitch();
     toggle_switch();
 }
+function get_status() {
+    $j.ajax({
+        url: 'apply.cgi?current_page=Module_frpc.asp&next_page=Module_frpc.asp&group_id=&modified=0&action_mode=+Refresh+&action_script=&action_wait=&first_time=&preferred_lang=CN&SystemCmd=frpc_status.sh',
+        dataType: 'html',
+        error: function(xhr) {
+            alert("error");
+        },
+        success: function(response) {
+            //alert("success");
+            setTimeout("check_FRPC_status();", 1000);
+        }
+    });
+}
+var noChange_status=0;
+var _responseLen;
+function check_FRPC_status(){
+    $j.ajax({
+        url: '/res/frpc_check.html',
+        dataType: 'html',
+        
+        error: function(xhr){
+            setTimeout("check_FRPC_status();", 1000);
+        },
+        success: function(response){
+            var _cmdBtn = document.getElementById("cmdBtn");
+            if(response.search("XU6J03M6") != -1){
+                frpc_status = response.replace("XU6J03M6", " ");
+                //alert(frpc_status);
+                document.getElementById("status").innerHTML = frpc_status;
+                return true;
+            }
 
+            if(_responseLen == response.length){
+                noChange_status++;
+            }else{
+                noChange_status = 0;
+            }
+            if(noChange_status > 100){
+                noChange_status = 0;
+                //refreshpage();
+            }else{
+                setTimeout("check_FRPC_status();", 400);
+            }
+            _responseLen = response.length;
+        }
+    });
+}
 function toggle_switch(){ //根据frpc_enable的值，打开或者关闭开关
     var rrt = document.getElementById("switch");
     if (document.form.frpc_enable.value != "1") {
@@ -122,6 +210,18 @@ function done_validating(action) { //提交操作5秒后刷洗网页
 }
 function reload_Soft_Center(){ //返回软件中心按钮
     location.href = "/Main_Soft_center.asp";
+}
+
+function menu_hook(title, tab) {
+    var enable_ss = "<% nvram_get("enable_ss"); %>";
+    var enable_soft = "<% nvram_get("enable_soft"); %>";
+    if(enable_ss == "1" && enable_soft == "1"){
+        tabtitle[tabtitle.length -2] = new Array("", "Frpc 内网穿透");
+        tablink[tablink.length -2] = new Array("", "Module_frpc.asp");
+    }else{
+        tabtitle[tabtitle.length -1] = new Array("", "Frpc 内网穿透");
+        tablink[tablink.length -1] = new Array("", "Module_frpc.asp");
+    }
 }
 
 function addTr(o) { //添加配置行操作
@@ -406,6 +506,7 @@ function version_show(){
                                                         </div>
                                                     </label>
                                                 </div>
+                                                <span style="margin-left: 300px;"><a href="https://raw.githubusercontent.com/koolshare/merlin_frpc/master/Changelog.txt" target="_blank"><em><u>[ 更新日志 ]</u></em></a></span>
                                             </td>
                                         </tr>
                                     </table>
@@ -418,8 +519,7 @@ function version_show(){
                                         <th style="width:25%;">版本信息</th>
                                         <td>
                                             <div id="frpc_version_show" style="padding-top:5px;margin-left:0px;margin-top:0px;float: left;"><i>插件版本：<% dbus_get_def("frpc_version", "未知"); %></i></div>
-                                            <div id="frpc_client_version_show" style="padding-top:5px;margin-left:50px;margin-top:0px;float: left;"><i>Frpc版本：<% dbus_get_def("frpc_client_version", "未知"); %></i></div>
-                                            <a style="margin-left: 170px;" href="https://raw.githubusercontent.com/koolshare/merlin_frpc/master/Changelog.txt" target="_blank"><em><u>[ 更新日志 ]</u></em></a>
+                                            <div id="frpc_status" style="padding-top:5px;margin-left:50px;margin-top:0px;float: left;"><i><span id="status">获取中...</span></i></div>
                                         </td>
                                         <tr>
                                             <th width="20%"><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(1)">服务器</a></th>

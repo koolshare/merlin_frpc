@@ -6,7 +6,9 @@ rm -f /koolshare/init.d/S98frpc.sh
 rm -f /koolshare/bin/frpc
 rm -f /koolshare/res/frpc-menu.js
 rm -f /koolshare/res/icon-frpc.png
+rm -f /koolshare/res/frpc_check.html
 rm -f /koolshare/scripts/config-frpc.sh
+rm -f /koolshare/scripts/frpc_status.sh
 rm -f /koolshare/webs/Module_frpc.asp
 rm -f /koolshare/configs/frpc.ini
 rm -fr /tmp/frpc*

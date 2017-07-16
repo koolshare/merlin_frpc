@@ -1,5 +1,7 @@
 Koolshare Asuswrt-Merlin Frpc Changelog
 ===========================================
+2.0.6 ( 2017-07-16 19:56 )
+  - Add       Web/脚本：增加进程运行状态显示
 2.0.5 ( 2017-07-02 09:56 )
   - Fix       Web/脚本：修复Frp和路由自带的DDNS冲突问题
   - Update    Web/脚本：允许TCP和UDP端口域名为空
