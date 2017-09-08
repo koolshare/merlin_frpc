@@ -5,6 +5,7 @@ source /koolshare/scripts/base.sh
 NAME=frpc
 BIN=/koolshare/bin/frpc
 INI_FILE=/koolshare/configs/frpc.ini
+STCP_INI_FILE=/tmp/.frpc_stcp.ini
 PID_FILE=/var/run/frpc.pid
 lan_ip=`nvram get lan_ipaddr`
 lan_port="80"
@@ -14,6 +15,7 @@ onstart() {
 killall frpc || true
 dbus set frpc_client_version=`${BIN} --version`
 en=${frpc_enable}
+stcp_en=`dbus list frpc_proto_node | grep stcp | xargs`
 cat > ${INI_FILE}<<-EOF
 [common]
 server_addr = ${frpc_common_server_addr}
@@ -28,7 +30,15 @@ login_fail_exit = ${frpc_common_login_fail_exit}
 user = ${frpc_common_user}
 EOF
 
-server_nu=`dbus list frpc_localhost_node | sort -n -t "_" -k 4|cut -d "=" -f 1|cut -d "_" -f 4`
+if [[ "${stcp_en}" != "" ]]; then
+cat > ${STCP_INI_FILE}<<-EOF
+[common]
+server_addr = ${frpc_common_server_addr}
+server_port = ${frpc_common_server_port}
+privilege_token = ${frpc_common_privilege_token}
+EOF
+fi
+server_nu=`dbus list frpc_localhost_node | sort -n -t "_" -k 4|cut -d "=" -f 1|cut -d "_" -f 4 | xargs`
 for nu in ${server_nu}
 do
     array_subname=`dbus get frpc_subname_node_$nu`
@@ -49,6 +59,27 @@ remote_port = ${array_remote_port}
 use_encryption = ${array_use_encryption}
 use_compression = ${array_use_gzip}
 EOF
+elif [[ "${array_type}" == "stcp" ]]; then
+cat >> ${INI_FILE} <<EOF
+[${array_subname}]
+type = ${array_type}
+sk = ${array_custom_domains}
+local_ip = ${array_local_ip}
+local_port = ${array_local_port}
+EOF
+cat >> ${STCP_INI_FILE}<<-EOF
+[secret_tcp_vistor]
+# frpc role vistor -> frps -> frpc role server
+role = vistor
+type = stcp
+# the server name you want to vistor
+server_name = ${frpc_common_user}.${array_subname}
+sk = ${array_custom_domains}
+# connect this address to vistor stcp server
+bind_addr = 127.0.0.1
+bind_port = 9000
+EOF
+
 else
 cat >> ${INI_FILE} <<EOF
 [${array_subname}]
@@ -72,6 +103,8 @@ elif [[ "${frpc_common_ddns}" == "0" ]] && [[ "${array_local_ip}" == "${lan_ip}"
     nvram commit
 fi
 done
+
+
 
 echo -n "setting ${NAME} crontab..."
 if [[ "${frpc_common_cron_time}" == "0" ]]; then

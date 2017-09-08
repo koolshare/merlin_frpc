@@ -4,5 +4,5 @@
     "md5": "b49801cbe0a10b6976be4eedea2bbffd", 
     "module": "frpc", 
     "title": "frpc穿透", 
-    "version": "2.0.6"
+    "version": "2.0.7"
 }

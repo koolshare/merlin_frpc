@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<!-- version: 2.0.6 -->
+<!-- version: 2.0.7 -->
 <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta HTTP-EQUIV="Pragma" CONTENT="no-cache"/>
@@ -70,6 +70,46 @@
     color:#FFFFFF;
     cursor:default;
 }
+.close {
+    background: red;
+    color: black;
+    border-radius: 12px;
+    line-height: 18px;
+    text-align: center;
+    height: 18px;
+    width: 18px;
+    font-size: 16px;
+    padding: 1px;
+    top: -10px;
+    right: -10px;
+    position: absolute;
+}
+/* use cross as close button */
+.close::before {
+    content: "\2716";
+}
+.contentM_qis {
+    position: fixed;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius:10px;
+    z-index: 10;
+    background-color:#2B373B;
+    margin-left: -100px;
+    top: 10px;
+    width:720px;
+    return height:auto;
+    box-shadow: 3px 3px 10px #000;
+    background: rgba(0,0,0,0.85);
+    display:none;
+}
+.user_title{
+    text-align:center;
+    font-size:18px;
+    color:#99FF00;
+    padding:10px;
+    font-weight:bold;
+}
 .frpc_btn {
     border: 1px solid #222;
     background: linear-gradient(to bottom, #003333  0%, #000000 100%); /* W3C */
@@ -116,6 +156,7 @@ function initial(){
     version_show();
     buildswitch();
     toggle_switch();
+    get_stcp_conf();
 }
 function get_status() {
     $j.ajax({
@@ -163,6 +204,20 @@ function check_FRPC_status(){
             _responseLen = response.length;
         }
     });
+}
+function get_stcp_conf(){
+	$j.ajax({
+		url: '/res/frpc_stcp_conf.html',
+		dataType: 'html',
+		
+		error: function(xhr){
+			setTimeout("get_stcp_conf();", 400);
+		},
+		success: function(response){
+			document.getElementById("usertxt").value = response;
+			return true;
+		}
+	});
 }
 function toggle_switch(){ //根据frpc_enable的值，打开或者关闭开关
     var rrt = document.getElementById("switch");
@@ -231,7 +286,13 @@ function addTr(o) { //添加配置行操作
             alert("提交的表单不能为空!");
             return false;
         }
-    }else{
+    } else if(trim(_form_addTr.proto_node.value)=="stcp") {
+        if(trim(_form_addTr.subname_node.value)=="" || trim(_form_addTr.subdomain_node.value)=="" || trim(_form_addTr.localhost_node.value)=="" || trim(_form_addTr.localport_node.value)=="" || trim(_form_addTr.remoteport_node.value)==""){
+            alert("提交的表单不能为空!");
+            return false;
+        }
+    }
+    else{
         if(trim(_form_addTr.subname_node.value)=="" || trim(_form_addTr.subdomain_node.value)=="" || trim(_form_addTr.localhost_node.value)=="" || trim(_form_addTr.localport_node.value)=="" || trim(_form_addTr.remoteport_node.value)==""){
             alert("提交的表单不能为空!");
             return false;
@@ -344,18 +405,32 @@ function editlTr(o){ //编辑节点功能，显示编辑面板
     if (remoteport == "http") {
         document.getElementById('remoteport_node').disabled=true;
         document.getElementById('subdomain_node').disabled=false;
+        document.getElementById('encryption_node').disabled=false;
+        document.getElementById('gzip_node').disabled=false;
         document.getElementById('remoteport_node').value=c["common_vhost_http_port"];
     } else if(remoteport == "https"){
         document.getElementById('remoteport_node').disabled=true;
         document.getElementById('subdomain_node').disabled=false;
+        document.getElementById('encryption_node').disabled=false;
+        document.getElementById('gzip_node').disabled=false;
         document.getElementById('remoteport_node').value=c["common_vhost_https_port"];
+    } else if(remoteport == "stcp"){
+        document.getElementById('remoteport_node').disabled=true;
+        document.getElementById('subdomain_node').disabled=false;
+        document.getElementById('encryption_node').disabled=true;
+        document.getElementById('gzip_node').disabled=true;
+        document.getElementById('remoteport_node').value="none";
     } else if(remoteport == "tcp"){
         document.getElementById('remoteport_node').disabled=false;
         document.getElementById('subdomain_node').disabled=true;
+        document.getElementById('encryption_node').disabled=false;
+        document.getElementById('gzip_node').disabled=false;
         document.getElementById('subdomain_node').value="none";
     } else if(remoteport == "udp"){
         document.getElementById('remoteport_node').disabled=false;
         document.getElementById('subdomain_node').disabled=true;
+        document.getElementById('encryption_node').disabled=false;
+        document.getElementById('gzip_node').disabled=false;
         document.getElementById('subdomain_node').value="none";
     }
     document.form.remoteport_node.value = c["remoteport_node"];
@@ -410,17 +485,30 @@ function refresh_html() { //用conf数据生成配置表格
         var c = confs[field];
         html = html + '<tr>';
         html = html + '<td>' + c["proto_node"] + '</td>';
-        html = html + '<td>' + c["subname_node"] + '</td>';
-        if(c["subdomain_node"]=="none"){
-            html = html + '<td>' + "" + '</td>';
+        if(c["proto_node"]=="stcp"){
+            html = html + '<td><a href="javascript:void(0)" onclick="open_stcp_conf()" style="cursor:pointer;"><i><u>' + c["subname_node"] + '</u></i></a></td>';
+        }else{
+            html = html + '<td>' + c["subname_node"] + '</td>';
+        }
+        if((c["proto_node"]=="tcp" || c["proto_node"]=="udp") && c["subdomain_node"]=="none"){
+            html = html + '<td>' + "-" + '</td>';
         }else{
             html = html + '<td>' + c["subdomain_node"] + '</td>';
         }
         html = html + '<td>' + c["localhost_node"] + '</td>';
         html = html + '<td>' + c["localport_node"] + '</td>';
-        html = html + '<td>' + c["remoteport_node"] + '</td>';
-        html = html + '<td>' + c["encryption_node"] + '</td>';
-        html = html + '<td>' + c["gzip_node"] + '</td>';
+        if(c["proto_node"]=="stcp" && c["remoteport_node"]=="none"){
+            html = html + '<td>' + "-" + '</td>';
+        }else{
+            html = html + '<td>' + c["remoteport_node"] + '</td>';
+        }
+        if(c["proto_node"]=="stcp"){
+            html = html + '<td>' + "-" + '</td>';
+            html = html + '<td>' + "-" + '</td>';
+        }else{
+            html = html + '<td>' + c["encryption_node"] + '</td>';
+            html = html + '<td>' + c["gzip_node"] + '</td>';
+        }
         html = html + '<td>';
         html = html + '<input style="margin-left:-3px;" id="dd_node_' + c["node"] + '" class="edit_btn" type="button" onclick="editlTr(this);" value="">'
         html = html + '</td>';
@@ -448,7 +536,40 @@ function version_show(){
         }
     });
 }
-
+function open_stcp_conf(){
+    $j("#stcp_settings").fadeIn(200);
+}
+function close_stcp_conf(){
+    $j("#stcp_settings").fadeOut(200);
+}
+$.fn.smartFloat = function() {
+    var position = function(element) {
+        var top = element.position().top, pos = element.css("position");
+        $(window).scroll(function() {
+            var scrolls = $(this).scrollTop();
+            if (scrolls > top) {
+                if (window.XMLHttpRequest) {
+                    element.css({
+                        position: "stcp_settings",
+                        top: 0
+                    });
+                } else {
+                    element.css({
+                        top: scrolls
+                    });	
+                }
+            }else {
+                element.css({
+                    position: pos,
+                    top: top
+                });
+            }
+        });
+    };
+    return $(this).each(function() {
+        position($(this));
+    });
+};
 </script>
 </head>
 <body onload="initial();">
@@ -652,7 +773,6 @@ function version_show(){
                                             </td>
                                         </tr>
                                     </table>
-
                                 <table id="conf_table" width="100%" border="1" align="center" cellpadding="4" cellspacing="0" class="FormTable_table" style="margin-top:8px;">
                                           <thead>
                                               <tr>
@@ -663,7 +783,7 @@ function version_show(){
                                           <tr>
                                             <th><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(9)">协议类型</a></th>
                                           <th><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(10)">代理名称</a></th>
-                                          <th><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(11)">域名配置</a></th>
+                                          <th><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(11)">域名配置/SK</a></th>
                                           <th><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(12)">内网主机地址</a></th>
                                           <th><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(13)">内网主机端口</a></th>
                                           <th><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(14)">远程主机端口</a></th>
@@ -677,11 +797,13 @@ function version_show(){
                                             <select id="proto_node" name="proto_node" style="width:70px;margin:0px 0px 0px 2px;" class="input_option" onchange="proto_onchange()" >
                                                 <option value="tcp">tcp</option>
                                                 <option value="udp">udp</option>
+                                                <option value="stcp">stcp</option>
                                                 <option value="http">http</option>
                                                 <option value="https">https</option>
                                                 <option value="http">router-http</option>
                                                 <option value="https">router-https</option>
                                                 <option value="tcp">router-ssh</option>
+                                                <option value="stcp">router-ssh-stcp</option>
                                             </select>
 
                                         </td>
@@ -737,7 +859,19 @@ function version_show(){
                                 </td>
                             </tr>
                         </table>
-
+                                    <!-- this is the popup area for user rules -->
+                                    <div id="stcp_settings"  class="contentM_qis" style="box-shadow: 3px 3px 10px #000;margin-top: 50px;">
+                                        <div class="user_title">Frpc stcp 配置文件参考&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)" onclick="close_stcp_conf();" value="关闭"><span class="close"></span></a></div>
+                                        <div style="margin-left:15px"><i>1&nbsp;&nbsp;文本框内的内容保存在【/tmp/.frpc_stcp.ini】。</i></div>
+                                        <div style="margin-left:15px"><i>2&nbsp;&nbsp;请自行保存到本地，并根据实际情况进行修改，如有疑问请到frp官网求助。</i></div>
+                                        <div id="user_tr" style="margin: 10px 10px 10px 10px;width:98%;text-align:center;">
+                                            <textarea cols="50" rows="20" wrap="off" id="usertxt" style="width:97%;padding-left:10px;padding-right:10px;border:1px solid #222;font-family:'Courier New', Courier, mono; font-size:11px;background:#475A5F;color:#FFFFFF;outline: none;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" disabled="disabled"></textarea>
+                                        </div>
+                                        <div style="margin-top:5px;padding-bottom:10px;width:100%;text-align:center;">
+                                            <input id="edit_node" class="button_gen" type="button" onclick="close_stcp_conf();" value="返回主界面">
+                                        </div>
+                                    </div>
+                                    <!-- end of the popouparea -->
                                 </td>
                             </tr>
                         </table>
@@ -773,24 +907,41 @@ remoteport=obj.options[index].text;
 if (remoteport == "http") {
         document.getElementById('remoteport_node').disabled=true;
         document.getElementById('subdomain_node').disabled=false;
+        document.getElementById('encryption_node').disabled=false;
+        document.getElementById('gzip_node').disabled=false;
         document.getElementById('subdomain_node').value="";
         document.getElementById('remoteport_node').value=vhost_http_port;
     } else if(remoteport == "https"){
         document.getElementById('remoteport_node').disabled=true;
         document.getElementById('subdomain_node').disabled=false;
+        document.getElementById('encryption_node').disabled=false;
+        document.getElementById('gzip_node').disabled=false;
         document.getElementById('subdomain_node').value="";
         document.getElementById('remoteport_node').value=vhost_https_port;
     } else if(remoteport == "tcp"){
         document.getElementById('remoteport_node').disabled=false;
         document.getElementById('subdomain_node').disabled=true;
+        document.getElementById('encryption_node').disabled=false;
+        document.getElementById('gzip_node').disabled=false;
         document.getElementById('subdomain_node').value="none";
     } else if(remoteport == "udp"){
         document.getElementById('remoteport_node').disabled=false;
         document.getElementById('subdomain_node').disabled=true;
+        document.getElementById('encryption_node').disabled=false;
+        document.getElementById('gzip_node').disabled=false;
         document.getElementById('subdomain_node').value="none";
+    } else if(remoteport == "stcp"){
+        document.getElementById('remoteport_node').disabled=true;
+        document.getElementById('subdomain_node').disabled=false;
+        document.getElementById('encryption_node').disabled=true;
+        document.getElementById('gzip_node').disabled=true;
+        document.getElementById('subdomain_node').value="";
+        document.getElementById('remoteport_node').value="none";
     } else if(remoteport == "router-http"){
         document.getElementById('remoteport_node').disabled=true;
         document.getElementById('subdomain_node').disabled=false;
+        document.getElementById('encryption_node').disabled=false;
+        document.getElementById('gzip_node').disabled=false;
         document.getElementById('subdomain_node').value="";
         document.getElementById('remoteport_node').value=vhost_http_port;
         document.getElementById('subname_node').value=r_subname_node_http;
@@ -799,6 +950,8 @@ if (remoteport == "http") {
     } else if(remoteport == "router-https"){
         document.getElementById('remoteport_node').disabled=true;
         document.getElementById('subdomain_node').disabled=false;
+        document.getElementById('encryption_node').disabled=false;
+        document.getElementById('gzip_node').disabled=false;
         document.getElementById('subdomain_node').value="";
         document.getElementById('remoteport_node').value=vhost_https_port;
         document.getElementById('subname_node').value=r_subname_node_https;
@@ -809,11 +962,24 @@ if (remoteport == "http") {
         document.getElementById('remoteport_node').value="";
         document.getElementById('subdomain_node').disabled=true;
         document.getElementById('subdomain_node').value="none";
+        document.getElementById('encryption_node').disabled=false;
+        document.getElementById('gzip_node').disabled=false;
+        document.getElementById('subname_node').value=r_subname_node_ssh;
+        document.getElementById('localhost_node').value=r_lan_ipaddr;
+        document.getElementById('localport_node').value=r_ssh_port;
+    } else if(remoteport == "router-ssh-stcp"){
+        document.getElementById('remoteport_node').disabled=true;
+        document.getElementById('subdomain_node').disabled=false;
+        document.getElementById('encryption_node').disabled=false;
+        document.getElementById('gzip_node').disabled=false;
+        document.getElementById('subdomain_node').value="";
+        document.getElementById('remoteport_node').value="none";
         document.getElementById('subname_node').value=r_subname_node_ssh;
         document.getElementById('localhost_node').value=r_lan_ipaddr;
         document.getElementById('localport_node').value=r_ssh_port;
     }
 }
+$("#stcp_settings").smartFloat();
 <!--[if !IE]>-->
     (function($){
         var i = 0;

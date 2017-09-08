@@ -11,6 +11,7 @@ rm -f /koolshare/scripts/config-frpc.sh
 rm -f /koolshare/scripts/frpc_status.sh
 rm -f /koolshare/webs/Module_frpc.asp
 rm -f /koolshare/configs/frpc.ini
+rm -f /tmp/.frpc_stcp.ini
 rm -fr /tmp/frpc*
 if [ "${frpc_common_ddns}" == "1" ]; then
     nvram set ddns_enable_x=0
