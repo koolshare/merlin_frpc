@@ -1,7 +1,7 @@
 #!/bin/sh
 
 MODULE=frpc
-VERSION="2.0.7"
+VERSION="2.0.8"
 cd /
 rm -f /koolshare/init.d/S98frpc.sh
 cp -f /tmp/$MODULE/bin/* /koolshare/bin/
@@ -21,7 +21,7 @@ dbus set frpc_client_version=`/koolshare/bin/frpc --version`
 dbus set frpc_common_cron_hour_min="hour"
 dbus set frpc_common_cron_time="1"
 ddns_set=`dbus get frpc_common_ddns`
-if [ "$en" == "" ]; then
+if [ "$ddns_set" == "" ]; then
     dbus set frpc_common_ddns="2"
 fi
 dbus set softcenter_module_frpc_install=1
