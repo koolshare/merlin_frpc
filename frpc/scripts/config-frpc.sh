@@ -15,7 +15,7 @@ onstart() {
 killall frpc || true
 dbus set frpc_client_version=`${BIN} --version`
 en=${frpc_enable}
-stcp_en=`dbus list frpc_proto_node | grep stcp | xargs`
+stcp_en=`dbus list frpc_proto_node | grep stcp`
 cat > ${INI_FILE}<<-EOF
 [common]
 server_addr = ${frpc_common_server_addr}
@@ -38,7 +38,7 @@ server_port = ${frpc_common_server_port}
 privilege_token = ${frpc_common_privilege_token}
 EOF
 fi
-server_nu=`dbus list frpc_localhost_node | sort -n -t "_" -k 4|cut -d "=" -f 1|cut -d "_" -f 4 | xargs`
+server_nu=`dbus list frpc_localhost_node | sort -n -t "_" -k 4|cut -d "=" -f 1|cut -d "_" -f 4`
 for nu in ${server_nu}
 do
     array_subname=`dbus get frpc_subname_node_$nu`
