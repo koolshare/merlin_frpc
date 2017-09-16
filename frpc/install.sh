@@ -1,7 +1,7 @@
 #!/bin/sh
 
 MODULE=frpc
-VERSION="2.0.9"
+VERSION="2.1.0"
 cd /
 rm -f /koolshare/init.d/S98frpc.sh
 cp -f /tmp/$MODULE/bin/* /koolshare/bin/
@@ -14,6 +14,7 @@ killall ${MODULE}
 chmod +x /koolshare/bin/frpc
 chmod +x /koolshare/scripts/config-frpc.sh
 chmod +x /koolshare/scripts/frpc_status.sh
+chmod +x /koolshare/scripts/uninstall_frpc.sh
 chmod +x /koolshare/init.d/S98frpc.sh
 sleep 1
 dbus set ${MODULE}_version="${VERSION}"
