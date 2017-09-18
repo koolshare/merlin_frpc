@@ -542,11 +542,11 @@ function open_stcp_conf(){
 function close_stcp_conf(){
     $j("#stcp_settings").fadeOut(200);
 }
-$.fn.smartFloat = function() {
+$j.fn.smartFloat = function() {
     var position = function(element) {
         var top = element.position().top, pos = element.css("position");
-        $(window).scroll(function() {
-            var scrolls = $(this).scrollTop();
+        $j(window).scroll(function() {
+            var scrolls = $j(this).scrollTop();
             if (scrolls > top) {
                 if (window.XMLHttpRequest) {
                     element.css({
@@ -566,8 +566,8 @@ $.fn.smartFloat = function() {
             }
         });
     };
-    return $(this).each(function() {
-        position($(this));
+    return $j(this).each(function() {
+        position($j(this));
     });
 };
 </script>
@@ -979,11 +979,6 @@ if (remoteport == "http") {
         document.getElementById('localport_node').value=r_ssh_port;
     }
 }
-$("#stcp_settings").smartFloat();
-<!--[if !IE]>-->
-    (function($){
-        var i = 0;
-    })(jQuery);
-<!--<![endif]-->
+$j("#stcp_settings").smartFloat();
 </script>
 </html>
