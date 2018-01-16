@@ -153,9 +153,9 @@ fun_ddns_start(){
     # ddns setting
     if [ "${frpc_enable}"x = "1"x ];then
         # ddns setting
-        if [[ "${frpc_common_ddns}" == "1" ]] && [[ "${frpc_common_domain}" != "" ]]; then
+        if [[ "${frpc_common_ddns}" == "1" ]] && [[ "${frpc_domain}" != "" ]]; then
             nvram set ddns_enable_x=1
-            nvram set ddns_hostname_x=${frpc_common_domain}
+            nvram set ddns_hostname_x=${frpc_domain}
             ddns_custom_updated 1
             nvram commit
         elif [[ "${frpc_common_ddns}" == "2" ]]; then
