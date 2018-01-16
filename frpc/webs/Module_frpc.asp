@@ -870,8 +870,10 @@ function toggle_func() {
                                         </thead>
                                     </table>
                                     </div>
-                                    <div class="formbottomdesc" id="cmdDesc">
+                                    <div style="margin-left:5px;margin-top:20px;margin-bottom:10px">
                                         <img src="/images/New_ui/export/line_export.png">
+                                    </div>
+                                    <div class="formbottomdesc" id="cmdDesc">
                                         <i>* 注意事项：</i><br>
                                         <i>1. 请使用虚拟内存！请使用虚拟内存！请使用虚拟内存！重要的事说三遍</i><br>
                                         <i>2. DDNS显示设置功能与系统自带的DDNS设置冲突，frp的DDNS显示设置会覆盖系统自带的DDNS设置！</i><br>
