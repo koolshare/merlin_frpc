@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<!-- version: 2.1.2 -->
+<!-- version: 2.1.7 -->
 <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta HTTP-EQUIV="Pragma" CONTENT="no-cache"/>
@@ -51,6 +51,7 @@ function initial(){
     version_show();
     buildswitch();
     toggle_switch();
+    get_frpc_conf();
     get_stcp_conf();
 }
 function get_status() {
@@ -97,6 +98,20 @@ function check_FRPC_status(){
                 setTimeout("check_FRPC_status();", 400);
             }
             _responseLen = response.length;
+        }
+    });
+}
+function get_frpc_conf(){
+    $j.ajax({
+        url: '/res/frpc_conf.html',
+        dataType: 'html',
+        
+        error: function(xhr){
+            setTimeout("get_frpc_conf();", 400);
+        },
+        success: function(response){
+            document.getElementById("frpctxt").value = response;
+            return true;
         }
     });
 }
@@ -438,7 +453,7 @@ function refresh_html() { //用conf数据生成配置表格
         html = html + '<tr>';
         html = html + '<td>' + c["proto_node"] + '</td>';
         if(c["proto_node"]=="stcp"){
-            html = html + '<td><a href="javascript:void(0)" onclick="open_stcp_conf()" style="cursor:pointer;"><i><u>' + c["subname_node"] + '</u></i></a></td>';
+            html = html + '<td><a href="javascript:void(0)" onclick="open_conf(\'stcp_settings\');" style="cursor:pointer;"><i><u>' + c["subname_node"] + '</u></i></a></td>';
         }else{
             html = html + '<td>' + c["subname_node"] + '</td>';
         }
@@ -495,13 +510,13 @@ function oncheckclick(obj) {
         document.form["f_" + obj.id].value = "0";
     }
 }
-function open_stcp_conf(){
-    $j("#stcp_settings").fadeIn(200);
+function open_conf(open_conf){
+    $j("#" + open_conf).fadeIn(200);
 }
-function close_stcp_conf(){
-    $j("#stcp_settings").fadeOut(200);
+function close_conf(close_conf){
+    $j("#" + close_conf).fadeOut(200);
 }
-$j.fn.smartFloat = function() {
+$j.fn.smartFloat = function(conf) {
     var position = function(element) {
         var top = element.position().top, pos = element.css("position");
         $j(window).scroll(function() {
@@ -509,7 +524,7 @@ $j.fn.smartFloat = function() {
             if (scrolls > top) {
                 if (window.XMLHttpRequest) {
                     element.css({
-                        position: "stcp_settings",
+                        position: conf,
                         top: 0
                     });
                 } else {
@@ -646,6 +661,13 @@ function toggle_func() {
                                                     <option value="min" selected="selected">分钟</option>
                                                     <option value="hour">小时</option>
                                                 </select> 重新注册一次服务
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <th width="20%">查看当前配置</th>
+                                            <td>
+                                                <a type="button" class="frpc_btn" style="cursor:pointer" href="javascript:void(0);" onclick="open_conf('frpc_settings');" >查看当前配置</a>
                                             </td>
                                         </tr>
                                     </table>
@@ -888,15 +910,26 @@ function toggle_func() {
                             </tr>
                         </table>
                                     <!-- this is the popup area for user rules -->
-                                    <div id="stcp_settings"  class="contentM_qis" style="box-shadow: 3px 3px 10px #000;margin-top: 50px;">
-                                        <div class="user_title">Frpc stcp 配置文件参考&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)" onclick="close_stcp_conf();" value="关闭"><span class="close"></span></a></div>
+                                    <div id="frpc_settings"  class="contentM_qis" style="box-shadow: 3px 3px 10px #000;margin-top: 70px;">
+                                        <div class="user_title">Frpc 配置文件&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)" onclick="close_conf('frpc_settings');" value="关闭"><span class="close"></span></a></div>
+                                        <div style="margin-left:15px"><i>1&nbsp;&nbsp;文本框内的内容保存在【/tmp/.frpc.ini】。</i></div>
+                                        <div style="margin-left:15px"><i>2&nbsp;&nbsp;请自行保存到本地，并根据实际情况进行修改，如有疑问请到frp官网求助。</i></div>
+                                        <div id="user_tr" style="margin: 10px 10px 10px 10px;width:98%;text-align:center;">
+                                            <textarea cols="50" rows="20" wrap="off" id="frpctxt" style="width:97%;padding-left:10px;padding-right:10px;border:1px solid #222;font-family:'Courier New', Courier, mono; font-size:11px;background:#475A5F;color:#FFFFFF;outline: none;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" disabled="disabled"></textarea>
+                                        </div>
+                                        <div style="margin-top:5px;padding-bottom:10px;width:100%;text-align:center;">
+                                            <input id="edit_node" class="button_gen" type="button" onclick="close_conf('frpc_settings');" value="返回主界面">
+                                        </div>
+                                    </div>
+                                    <div id="stcp_settings"  class="contentM_qis" style="box-shadow: 3px 3px 10px #000;margin-top: 70px;">
+                                        <div class="user_title">Frpc stcp 配置文件参考&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)" onclick="close_conf('stcp_settings');" value="关闭"><span class="close"></span></a></div>
                                         <div style="margin-left:15px"><i>1&nbsp;&nbsp;文本框内的内容保存在【/tmp/.frpc_stcp.ini】。</i></div>
                                         <div style="margin-left:15px"><i>2&nbsp;&nbsp;请自行保存到本地，并根据实际情况进行修改，如有疑问请到frp官网求助。</i></div>
                                         <div id="user_tr" style="margin: 10px 10px 10px 10px;width:98%;text-align:center;">
                                             <textarea cols="50" rows="20" wrap="off" id="usertxt" style="width:97%;padding-left:10px;padding-right:10px;border:1px solid #222;font-family:'Courier New', Courier, mono; font-size:11px;background:#475A5F;color:#FFFFFF;outline: none;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" disabled="disabled"></textarea>
                                         </div>
                                         <div style="margin-top:5px;padding-bottom:10px;width:100%;text-align:center;">
-                                            <input id="edit_node" class="button_gen" type="button" onclick="close_stcp_conf();" value="返回主界面">
+                                            <input id="edit_node" class="button_gen" type="button" onclick="close_conf('stcp_settings');" value="返回主界面">
                                         </div>
                                     </div>
                                     <!-- end of the popouparea -->
@@ -1007,6 +1040,7 @@ if (remoteport == "http") {
         document.getElementById('localport_node').value=r_ssh_port;
     }
 }
-$j("#stcp_settings").smartFloat();
+$j("#frpc_settings").smartFloat("frpc_settings");
+$j("#stcp_settings").smartFloat("stcp_settings");
 </script>
 </html>

@@ -9,6 +9,7 @@ rm -f /koolshare/res/frpc-menu.js
 rm -f /koolshare/res/icon-frpc.png
 rm -f /koolshare/res/frpc_check.html
 rm -f /koolshare/res/frpc_stcp_conf.html
+rm -f /koolshare/res/frpc_conf.html
 rm -f /koolshare/res/frpc.css
 rm -f /koolshare/scripts/config-frpc.sh
 rm -f /koolshare/scripts/frpc_status.sh
