@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<!-- version: 2.1.8 -->
+<!-- version: 2.1.10 -->
 <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta HTTP-EQUIV="Pragma" CONTENT="no-cache"/>
@@ -9,7 +9,7 @@
 <link rel="shortcut icon" href="images/favicon.png"/>
 <link rel="icon" href="images/favicon.png"/>
 <title>软件中心 - Frp内网穿透</title>
-<link rel="stylesheet" type="text/css" href="index_style.css"/> 
+<link rel="stylesheet" type="text/css" href="index_style.css"/>
 <link rel="stylesheet" type="text/css" href="form_style.css"/>
 <link rel="stylesheet" type="text/css" href="css/element.css">
 <link rel="stylesheet" type="text/css" href="usp_style.css"/>
@@ -73,7 +73,7 @@ function check_FRPC_status(){
     $j.ajax({
         url: '/res/frpc_check.html',
         dataType: 'html',
-        
+
         error: function(xhr){
             setTimeout("check_FRPC_status();", 1000);
         },
@@ -105,7 +105,7 @@ function get_frpc_conf(){
     $j.ajax({
         url: '/res/frpc_conf.html',
         dataType: 'html',
-        
+
         error: function(xhr){
             setTimeout("get_frpc_conf();", 400);
         },
@@ -119,7 +119,7 @@ function get_stcp_conf(){
     $j.ajax({
         url: '/res/frpc_stcp_conf.html',
         dataType: 'html',
-        
+
         error: function(xhr){
             setTimeout("get_stcp_conf();", 400);
         },
@@ -530,7 +530,7 @@ $j.fn.smartFloat = function(conf) {
                 } else {
                     element.css({
                         top: scrolls
-                    });	
+                    });
                 }
             }else {
                 element.css({
@@ -640,7 +640,7 @@ function toggle_func() {
                                             <td><span id="status">获取中...</span>
                                             </td>
                                         </tr>
-                                        
+
                                         <tr>
                                             <th width="20%"><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(18)">DDNS显示设置</a></th>
                                             <td>
@@ -729,8 +729,8 @@ function toggle_func() {
                                             <th width="20%"><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(22)">连接设置</a></th>
                                             <td>
                                                 <select id="frpc_common_login_fail_exit" name="frpc_common_login_fail_exit" style="width:165px;margin:0px 0px 0px 2px;" class="input_option" >
-                                                    <option value="true">失败后重复连接</option>
-                                                    <option value="false">失败后退出程序</option>
+                                                    <option value="false">失败后重复连接</option>
+                                                    <option value="true">失败后退出程序</option>
                                                 </select>
                                             </td>
                                         </tr>
@@ -952,7 +952,7 @@ function toggle_func() {
 function proto_onchange()
 {
 var remoteport="";
-var obj=document.getElementById('proto_node'); 
+var obj=document.getElementById('proto_node');
 var index=obj.selectedIndex; //序号，取当前选中选项的序号
 var r_https_port="<%  nvram_get(https_lanport); %>"
 var r_ssh_port="<%  nvram_get(sshd_port); %>"
