@@ -1,7 +1,7 @@
 #!/bin/sh
 
 MODULE=frpc
-VERSION="2.1.10"
+VERSION="2.1.11"
 cd /tmp
 rm -f /koolshare/init.d/S98frpc.sh
 if [ ! -x /koolshare/bin/base64_encode ]; then
