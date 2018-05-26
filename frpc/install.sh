@@ -1,7 +1,7 @@
 #!/bin/sh
 
 MODULE=frpc
-VERSION="2.1.12"
+VERSION="2.1.13"
 cd /tmp
 rm -f /koolshare/init.d/S98frpc.sh
 if [ ! -x /koolshare/bin/base64_encode ]; then
@@ -24,9 +24,9 @@ chmod +x /koolshare/scripts/uninstall_frpc.sh
 chmod +x /koolshare/init.d/S98frpc.sh
 sleep 1
 dbus set frpc_client_version=`/koolshare/bin/frpc --version`
-if [ "`dbus get frpc_version`"x = "2.1.4"x  ]; then
-    dbus set frpc_customize_conf="1"
-fi
+#if [ "`dbus get frpc_version`"x = "2.1.4"x  ]; then
+#    dbus set frpc_customize_conf="1"
+#fi
 if [ "`dbus get frpc_common_ddns`"x = ""x ] && [ "`dbus get frpc_ddns`"x = ""x ]; then
     dbus set frpc_common_ddns="2"
 elif [ "`dbus get frpc_common_ddns`"x = "1"x ] || [ "`dbus get frpc_ddns`"x = "1"x ]; then
